@@ -1,0 +1,1164 @@
+[
+  {
+    "id": "TC-AUTH-01",
+    "category": "Authentication",
+    "name": "Registrasi Akun Siswa Baru (Normal)",
+    "method": "POST",
+    "url": "/auth/register",
+    "full_url": "http://127.0.0.1:8000/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "full_name": "Budi Santoso",
+      "email": "budi.santoso.d56dc6@mail.com",
+      "password": "Rahasia123!"
+    },
+    "expected_status": 201,
+    "actual_status": 201,
+    "latency_ms": 633.63,
+    "passed": true,
+    "res_body": {
+      "message": "Registrasi berhasil",
+      "data": {
+        "id": "faadc776-1b6f-4229-99fe-57d0fd2bfde7",
+        "full_name": "Budi Santoso",
+        "email": "budi.santoso.d56dc6@mail.com",
+        "role": "student"
+      },
+      "errors": null
+    },
+    "notes": "Mendaftarkan siswa baru dengan email unik dan format data valid."
+  },
+  {
+    "id": "TC-AUTH-02",
+    "category": "Authentication",
+    "name": "Registrasi Email yang Sudah Terdaftar (Duplikat)",
+    "method": "POST",
+    "url": "/auth/register",
+    "full_url": "http://127.0.0.1:8000/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "full_name": "Budi Kloning",
+      "email": "budi.santoso.d56dc6@mail.com",
+      "password": "PasswordLain123!"
+    },
+    "expected_status": 409,
+    "actual_status": 409,
+    "latency_ms": 555.67,
+    "passed": true,
+    "res_body": {
+      "message": "Email sudah terdaftar",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Sistem menolak registrasi email yang sudah ada dengan response HTTP 409 Conflict."
+  },
+  {
+    "id": "TC-AUTH-03",
+    "category": "Authentication",
+    "name": "Registrasi Mencoba Injeksi Role Admin",
+    "method": "POST",
+    "url": "/auth/register",
+    "full_url": "http://127.0.0.1:8000/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "full_name": "Attacker Role",
+      "email": "attacker.862cc1@mail.com",
+      "password": "Password123!",
+      "role": "admin"
+    },
+    "expected_status": 201,
+    "actual_status": 201,
+    "latency_ms": 776.83,
+    "passed": true,
+    "res_body": {
+      "message": "Registrasi berhasil",
+      "data": {
+        "id": "5dd0f563-3999-4d26-9aca-707da7a6cc21",
+        "full_name": "Attacker Role",
+        "email": "attacker.862cc1@mail.com",
+        "role": "student"
+      },
+      "errors": null
+    },
+    "notes": "Sistem mengabaikan input role dan memaksa role selalu 'student' untuk keamanan."
+  },
+  {
+    "id": "TC-AUTH-04",
+    "category": "Authentication",
+    "name": "Registrasi dengan Format Email dan Password Tidak Valid",
+    "method": "POST",
+    "url": "/auth/register",
+    "full_url": "http://127.0.0.1:8000/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "full_name": "",
+      "email": "bukan-sebuah-email",
+      "password": "123"
+    },
+    "expected_status": 422,
+    "actual_status": 422,
+    "latency_ms": 364.37,
+    "passed": true,
+    "res_body": {
+      "message": "Validasi gagal",
+      "data": null,
+      "errors": [
+        {
+          "field": "full_name",
+          "message": "String should have at least 2 characters"
+        },
+        {
+          "field": "email",
+          "message": "value is not a valid email address: An email address must have an @-sign."
+        },
+        {
+          "field": "password",
+          "message": "String should have at least 8 characters"
+        }
+      ]
+    },
+    "notes": "Pydantic menangkap format email tidak valid dan panjang password kurang dari batas minimal."
+  },
+  {
+    "id": "TC-AUTH-05",
+    "category": "Authentication",
+    "name": "Login Siswa dengan Kredensial Valid",
+    "method": "POST",
+    "url": "/auth/login",
+    "full_url": "http://127.0.0.1:8000/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "email": "budi.santoso.d56dc6@mail.com",
+      "password": "Rahasia123!"
+    },
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 629.47,
+    "passed": true,
+    "res_body": {
+      "message": "Login berhasil",
+      "data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+        "token_type": "bearer",
+        "user": {
+          "id": "faadc776-1b6f-4229-99fe-57d0fd2bfde7",
+          "full_name": "Budi Santoso",
+          "email": "budi.santoso.d56dc6@mail.com",
+          "role": "student"
+        }
+      },
+      "errors": null
+    },
+    "notes": "Mengembalikan JWT access_token bertipe Bearer dan objek user."
+  },
+  {
+    "id": "TC-AUTH-06",
+    "category": "Authentication",
+    "name": "Login Akun Admin Seed",
+    "method": "POST",
+    "url": "/auth/login",
+    "full_url": "http://127.0.0.1:8000/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "email": "admin@skillbridge.id",
+      "password": "Admin123!"
+    },
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 591.8,
+    "passed": true,
+    "res_body": {
+      "message": "Login berhasil",
+      "data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZGUzNWIzMC03YzY5LTRlYzAtOTU2OC05YWMyMmQ2NzkyNDIiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3OTI5OTkyODJ9.00U5qA_8vwZuyAp_x-XacGGU3Iu-4A5jMihqSsIiZiA",
+        "token_type": "bearer",
+        "user": {
+          "id": "5de35b30-7c69-4ec0-9568-9ac22d679242",
+          "full_name": "Admin SkillBridge",
+          "email": "admin@skillbridge.id",
+          "role": "admin"
+        }
+      },
+      "errors": null
+    },
+    "notes": "Login akun default admin dari seed database."
+  },
+  {
+    "id": "TC-AUTH-07",
+    "category": "Authentication",
+    "name": "Login Akun Instruktur Seed",
+    "method": "POST",
+    "url": "/auth/login",
+    "full_url": "http://127.0.0.1:8000/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "email": "instructor@skillbridge.id",
+      "password": "Instruktur123!"
+    },
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 574.76,
+    "passed": true,
+    "res_body": {
+      "message": "Login berhasil",
+      "data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmM2FjNjlkNy1mODExLTQxZTEtYjNlNy00Y2Q1ZDY5YmJiOGYiLCJyb2xlIjoiaW5zdHJ1Y3RvciIsImV4cCI6MTc5Mjk5OTI4Mn0.WUfiOI2o4umqi2H-LFOcI03hNv05Y7-1N7H9vR3wFho",
+        "token_type": "bearer",
+        "user": {
+          "id": "f3ac69d7-f811-41e1-b3e7-4cd5d69bbb8f",
+          "full_name": "Instruktur Satu",
+          "email": "instructor@skillbridge.id",
+          "role": "instructor"
+        }
+      },
+      "errors": null
+    },
+    "notes": "Login akun default instructor dari seed database."
+  },
+  {
+    "id": "TC-AUTH-08",
+    "category": "Authentication",
+    "name": "Login dengan Password Salah",
+    "method": "POST",
+    "url": "/auth/login",
+    "full_url": "http://127.0.0.1:8000/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "email": "budi.santoso.d56dc6@mail.com",
+      "password": "PasswordSalahTotal!"
+    },
+    "expected_status": 401,
+    "actual_status": 401,
+    "latency_ms": 703.1,
+    "passed": true,
+    "res_body": {
+      "message": "Email atau password salah",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Menghasilkan pesan generik 'Email atau password salah' untuk mencegah user enumeration."
+  },
+  {
+    "id": "TC-AUTH-09",
+    "category": "Authentication",
+    "name": "Mendapatkan Data Profil Pengguna Aktif (/auth/me)",
+    "method": "GET",
+    "url": "/auth/me",
+    "full_url": "http://127.0.0.1:8000/auth/me",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": null,
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 351.09,
+    "passed": true,
+    "res_body": {
+      "message": "Berhasil",
+      "data": {
+        "id": "faadc776-1b6f-4229-99fe-57d0fd2bfde7",
+        "full_name": "Budi Santoso",
+        "email": "budi.santoso.d56dc6@mail.com",
+        "role": "student"
+      },
+      "errors": null
+    },
+    "notes": "Memvalidasi header Authorization Bearer token dan mengembalikan info profil pemilik token."
+  },
+  {
+    "id": "TC-AUTH-10",
+    "category": "Authentication",
+    "name": "Mengakses /auth/me Tanpa Bearer Token",
+    "method": "GET",
+    "url": "/auth/me",
+    "full_url": "http://127.0.0.1:8000/auth/me",
+    "headers": {},
+    "req_body": null,
+    "expected_status": 401,
+    "actual_status": 401,
+    "latency_ms": 336.47,
+    "passed": true,
+    "res_body": {
+      "message": "Token tidak dikirim",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Endpoint menolak permintaan anonim yang tidak membawa header otorisasi."
+  },
+  {
+    "id": "TC-CRS-01",
+    "category": "Courses",
+    "name": "Mendapatkan Katalog Kursus Terpublikasi (/courses)",
+    "method": "GET",
+    "url": "/courses",
+    "full_url": "http://127.0.0.1:8000/courses",
+    "headers": {},
+    "req_body": null,
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 326.87,
+    "passed": true,
+    "res_body": {
+      "message": "Berhasil",
+      "data": [
+        {
+          "id": "11bce27b-7552-4295-98ce-5f27694c4f6e",
+          "category_id": "7cbdc67e-082c-428c-a9dd-e9473680cafb",
+          "instructor_id": "f3ac69d7-f811-41e1-b3e7-4cd5d69bbb8f",
+          "title": "REST API dengan FastAPI",
+          "description": "Dari nol sampai API siap produksi.",
+          "price": "150000.00",
+          "is_published": true
+        }
+      ],
+      "errors": null
+    },
+    "notes": "Mengembalikan daftar kursus aktif dengan status is_published=true."
+  },
+  {
+    "id": "TC-CRS-02",
+    "category": "Courses",
+    "name": "Mendapatkan Detail Kursus (REST API dengan FastAPI)",
+    "method": "GET",
+    "url": "/courses/11bce27b-7552-4295-98ce-5f27694c4f6e",
+    "full_url": "http://127.0.0.1:8000/courses/11bce27b-7552-4295-98ce-5f27694c4f6e",
+    "headers": {},
+    "req_body": null,
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 348.23,
+    "passed": true,
+    "res_body": {
+      "message": "Berhasil",
+      "data": {
+        "id": "11bce27b-7552-4295-98ce-5f27694c4f6e",
+        "category_id": "7cbdc67e-082c-428c-a9dd-e9473680cafb",
+        "instructor_id": "f3ac69d7-f811-41e1-b3e7-4cd5d69bbb8f",
+        "title": "REST API dengan FastAPI",
+        "description": "Dari nol sampai API siap produksi.",
+        "price": "150000.00",
+        "is_published": true,
+        "modules": [
+          {
+            "id": "37b00b44-ffc1-48d2-977e-22387b561735",
+            "title": "Pengenalan REST",
+            "position": 1
+          },
+          {
+            "id": "078b919a-eb3a-4444-81dd-1b7c3bb45abc",
+            "title": "Routing dan Validasi",
+            "position": 2
+          },
+          {
+            "id": "f4deb50e-d230-463e-a7ef-8a0edb0c2786",
+            "title": "Database dan ORM",
+            "position": 3
+          },
+          {
+            "id": "0f5d89dc-17fb-4e82-9297-379b967efaef",
+            "title": "Autentikasi JWT",
+            "position": 4
+          }
+        ]
+      },
+      "errors": null
+    },
+    "notes": "Mengembalikan detail kursus lengkap dengan daftar modul pembelajaran (eager loaded)."
+  },
+  {
+    "id": "TC-CRS-03",
+    "category": "Courses",
+    "name": "Mendapatkan Detail Kursus dengan UUID Acak yang Tidak Ada",
+    "method": "GET",
+    "url": "/courses/006cbac3-7e48-4236-92ba-65237ff1bc86",
+    "full_url": "http://127.0.0.1:8000/courses/006cbac3-7e48-4236-92ba-65237ff1bc86",
+    "headers": {},
+    "req_body": null,
+    "expected_status": 404,
+    "actual_status": 404,
+    "latency_ms": 332.81,
+    "passed": true,
+    "res_body": {
+      "message": "Kursus tidak ditemukan",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Sistem mengembalikan 404 Not Found dengan format pesan error terstandar."
+  },
+  {
+    "id": "TC-CRS-04",
+    "category": "Courses",
+    "name": "Mendapatkan Detail Kursus dengan Parameter Bukan UUID",
+    "method": "GET",
+    "url": "/courses/bukan-format-uuid-valid",
+    "full_url": "http://127.0.0.1:8000/courses/bukan-format-uuid-valid",
+    "headers": {},
+    "req_body": null,
+    "expected_status": 422,
+    "actual_status": 422,
+    "latency_ms": 345.93,
+    "passed": true,
+    "res_body": {
+      "message": "Validasi gagal",
+      "data": null,
+      "errors": [
+        {
+          "field": "course_id",
+          "message": "Input should be a valid UUID, invalid character: found `u` at 1"
+        }
+      ]
+    },
+    "notes": "Pydantic memvalidasi path parameter dan menolak format non-UUID dengan HTTP 422."
+  },
+  {
+    "id": "TC-CRS-05",
+    "category": "Courses",
+    "name": "Membuat Kursus Baru oleh Instruktur (Role Instructor)",
+    "method": "POST",
+    "url": "/courses",
+    "full_url": "http://127.0.0.1:8000/courses",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmM2FjNjlkNy1mODExLTQxZTEtYjNlNy00Y2Q1ZDY5YmJiOGYiLCJyb2xlIjoiaW5zdHJ1Y3RvciIsImV4cCI6MTc5Mjk5OTI4Mn0.WUfiOI2o4umqi2H-LFOcI03hNv05Y7-1N7H9vR3wFho",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "category_id": "7cbdc67e-082c-428c-a9dd-e9473680cafb",
+      "title": "Arsitektur Microservices dengan Python",
+      "description": "Membangun sistem microservices berskala tinggi menggunakan FastAPI dan Docker.",
+      "price": "250000.00"
+    },
+    "expected_status": 201,
+    "actual_status": 201,
+    "latency_ms": 347.17,
+    "passed": true,
+    "res_body": {
+      "message": "Kursus berhasil dibuat",
+      "data": {
+        "id": "61312474-dc6d-4385-8300-15553ffc0963",
+        "category_id": "7cbdc67e-082c-428c-a9dd-e9473680cafb",
+        "instructor_id": "f3ac69d7-f811-41e1-b3e7-4cd5d69bbb8f",
+        "title": "Arsitektur Microservices dengan Python",
+        "description": "Membangun sistem microservices berskala tinggi menggunakan FastAPI dan Docker.",
+        "price": "250000.00",
+        "is_published": true
+      },
+      "errors": null
+    },
+    "notes": "Role instructor diizinkan membuat kursus baru."
+  },
+  {
+    "id": "TC-CRS-06",
+    "category": "Courses",
+    "name": "Siswa Mencoba Membuat Kursus Baru (Role Student)",
+    "method": "POST",
+    "url": "/courses",
+    "full_url": "http://127.0.0.1:8000/courses",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "category_id": "7cbdc67e-082c-428c-a9dd-e9473680cafb",
+      "title": "Kursus Terlarang oleh Siswa",
+      "price": "50000.00"
+    },
+    "expected_status": 403,
+    "actual_status": 403,
+    "latency_ms": 357.07,
+    "passed": true,
+    "res_body": {
+      "message": "Anda tidak punya akses ke resource ini",
+      "data": null,
+      "errors": null
+    },
+    "notes": "RBAC menolak aksi pembuatan kursus oleh role student dengan HTTP 403 Forbidden."
+  },
+  {
+    "id": "TC-ENR-01",
+    "category": "Enrollments",
+    "name": "Pendaftaran Kursus oleh Siswa (Auto Order & Invoice)",
+    "method": "POST",
+    "url": "/enrollments",
+    "full_url": "http://127.0.0.1:8000/enrollments",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "course_id": "11bce27b-7552-4295-98ce-5f27694c4f6e"
+    },
+    "expected_status": 201,
+    "actual_status": 201,
+    "latency_ms": 395.39,
+    "passed": true,
+    "res_body": {
+      "message": "Enrollment dibuat, silakan lakukan pembayaran",
+      "data": {
+        "enrollment": {
+          "id": "4c055b75-c3de-4d16-8d52-df8777eea324",
+          "course_id": "11bce27b-7552-4295-98ce-5f27694c4f6e",
+          "order_id": "b7ffb08a-eeda-4f6a-89c2-d1dd1aec7dbd",
+          "status": "pending_payment",
+          "created_at": "2026-10-26T06:21:26.631999Z"
+        },
+        "order": {
+          "id": "b7ffb08a-eeda-4f6a-89c2-d1dd1aec7dbd",
+          "total_amount": "150000.00",
+          "status": "pending"
+        },
+        "invoice": {
+          "id": "3f2a0629-8cf8-4a12-88f0-5f2651514461",
+          "invoice_number": "INV-20261026-B7FFB08A",
+          "amount": "150000.00",
+          "status": "unpaid"
+        }
+      },
+      "errors": null
+    },
+    "notes": "Dalam satu transaksi database: dibuat Order, Invoice (status unpaid), dan Enrollment (pending_payment)."
+  },
+  {
+    "id": "TC-ENR-02",
+    "category": "Enrollments",
+    "name": "Siswa Mendaftar Ulang ke Kursus yang Sama (Duplikasi)",
+    "method": "POST",
+    "url": "/enrollments",
+    "full_url": "http://127.0.0.1:8000/enrollments",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "course_id": "11bce27b-7552-4295-98ce-5f27694c4f6e"
+    },
+    "expected_status": 409,
+    "actual_status": 409,
+    "latency_ms": 357.42,
+    "passed": true,
+    "res_body": {
+      "message": "Anda sudah terdaftar di kursus ini",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Mencegah duplikasi enrollment untuk kursus dan siswa yang sama."
+  },
+  {
+    "id": "TC-ENR-03",
+    "category": "Enrollments",
+    "name": "Admin Mencoba Mendaftar Kursus (Non-Student)",
+    "method": "POST",
+    "url": "/enrollments",
+    "full_url": "http://127.0.0.1:8000/enrollments",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1ZGUzNWIzMC03YzY5LTRlYzAtOTU2OC05YWMyMmQ2NzkyNDIiLCJyb2xlIjoiYWRtaW4iLCJleHAiOjE3OTI5OTkyODJ9.00U5qA_8vwZuyAp_x-XacGGU3Iu-4A5jMihqSsIiZiA",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "course_id": "11bce27b-7552-4295-98ce-5f27694c4f6e"
+    },
+    "expected_status": 403,
+    "actual_status": 403,
+    "latency_ms": 356.24,
+    "passed": true,
+    "res_body": {
+      "message": "Anda tidak punya akses ke resource ini",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Hanya akun dengan role student yang diperbolehkan mendaftar kursus."
+  },
+  {
+    "id": "TC-ENR-04",
+    "category": "Enrollments",
+    "name": "Mengecek /enrollments/mycourses Sebelum Pembayaran",
+    "method": "GET",
+    "url": "/enrollments/mycourses",
+    "full_url": "http://127.0.0.1:8000/enrollments/mycourses",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": null,
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 357.75,
+    "passed": true,
+    "res_body": {
+      "message": "Berhasil",
+      "data": [
+        {
+          "enrollment_id": "4c055b75-c3de-4d16-8d52-df8777eea324",
+          "course_id": "11bce27b-7552-4295-98ce-5f27694c4f6e",
+          "title": "REST API dengan FastAPI",
+          "status": "pending_payment",
+          "completed_modules": 0,
+          "total_modules": 4,
+          "progress_percentage": 0.0
+        }
+      ],
+      "errors": null
+    },
+    "notes": "Memastikan kursus terdaftar muncul di daftar kursus siswa dengan status pending_payment."
+  },
+  {
+    "id": "TC-ENR-05",
+    "category": "Enrollments",
+    "name": "Siswa Mencoba Memperbarui Progress Modul Sebelum Melunasi Pembayaran",
+    "method": "PATCH",
+    "url": "/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "full_url": "http://127.0.0.1:8000/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "module_id": "37b00b44-ffc1-48d2-977e-22387b561735",
+      "status": "completed"
+    },
+    "expected_status": 403,
+    "actual_status": 403,
+    "latency_ms": 333.14,
+    "passed": true,
+    "res_body": {
+      "message": "Enrollment belum aktif, selesaikan pembayaran terlebih dahulu",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Akses materi/progress terkunci sampai invoice berhasil dibayar."
+  },
+  {
+    "id": "TC-PAY-01",
+    "category": "Payments",
+    "name": "Inisiasi Pembayaran Invoice (Bank Transfer)",
+    "method": "POST",
+    "url": "/payments",
+    "full_url": "http://127.0.0.1:8000/payments",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "invoice_id": "3f2a0629-8cf8-4a12-88f0-5f2651514461",
+      "method": "bank_transfer"
+    },
+    "expected_status": 201,
+    "actual_status": 201,
+    "latency_ms": 338.92,
+    "passed": true,
+    "res_body": {
+      "message": "Pembayaran dibuat, menunggu konfirmasi gateway",
+      "data": {
+        "id": "e52311a7-93a0-498c-bb96-38f4aea9d4f7",
+        "invoice_id": "3f2a0629-8cf8-4a12-88f0-5f2651514461",
+        "method": "bank_transfer",
+        "external_ref": "SB-EA451674739A",
+        "amount": "150000.00",
+        "status": "pending"
+      },
+      "errors": null
+    },
+    "notes": "Membuat record Payment berstatus pending dan menghasilkan external_ref unik."
+  },
+  {
+    "id": "TC-PAY-02",
+    "category": "Payments",
+    "name": "Inisiasi Pembayaran Baru saat Masih Ada Transaksi Pending",
+    "method": "POST",
+    "url": "/payments",
+    "full_url": "http://127.0.0.1:8000/payments",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "invoice_id": "3f2a0629-8cf8-4a12-88f0-5f2651514461",
+      "method": "qris"
+    },
+    "expected_status": 409,
+    "actual_status": 409,
+    "latency_ms": 349.96,
+    "passed": true,
+    "res_body": {
+      "message": "Masih ada pembayaran yang menunggu untuk invoice ini",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Sistem mencegah spam pembayaran ganda pada invoice yang sama."
+  },
+  {
+    "id": "TC-PAY-03",
+    "category": "Payments",
+    "name": "Callback Gateway Tanpa Header X-Callback-Token",
+    "method": "POST",
+    "url": "/payments/callback",
+    "full_url": "http://127.0.0.1:8000/payments/callback",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "external_ref": "SB-EA451674739A",
+      "status": "paid",
+      "amount": "150000.00"
+    },
+    "expected_status": 401,
+    "actual_status": 401,
+    "latency_ms": 305.37,
+    "passed": true,
+    "res_body": {
+      "message": "Callback token tidak valid",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Melindungi webhook dari pemalsuan eksternal tanpa rahasia callback."
+  },
+  {
+    "id": "TC-PAY-04",
+    "category": "Payments",
+    "name": "Callback Gateway dengan X-Callback-Token Salah/Palsu",
+    "method": "POST",
+    "url": "/payments/callback",
+    "full_url": "http://127.0.0.1:8000/payments/callback",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Callback-Token": "token-palsu-ngawur"
+    },
+    "req_body": {
+      "external_ref": "SB-EA451674739A",
+      "status": "paid",
+      "amount": "150000.00"
+    },
+    "expected_status": 401,
+    "actual_status": 401,
+    "latency_ms": 340.14,
+    "passed": true,
+    "res_body": {
+      "message": "Callback token tidak valid",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Perbandingan hmac.compare_digest menolak secret yang tidak cocok."
+  },
+  {
+    "id": "TC-PAY-05",
+    "category": "Payments",
+    "name": "Callback Gateway dengan Nominal yang Tidak Cocok dengan Tagihan",
+    "method": "POST",
+    "url": "/payments/callback",
+    "full_url": "http://127.0.0.1:8000/payments/callback",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Callback-Token": "rahasia-callback-gateway"
+    },
+    "req_body": {
+      "external_ref": "SB-EA451674739A",
+      "status": "paid",
+      "amount": "9999.00"
+    },
+    "expected_status": 422,
+    "actual_status": 422,
+    "latency_ms": 321.63,
+    "passed": true,
+    "res_body": {
+      "message": "Nominal callback tidak sesuai dengan tagihan",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Integritas nominal terjaga; callback gagal jika nominal berbeda dengan tagihan invoice."
+  },
+  {
+    "id": "TC-PAY-06",
+    "category": "Payments",
+    "name": "Callback Gateway Pelunasan Berhasil (Status: paid)",
+    "method": "POST",
+    "url": "/payments/callback",
+    "full_url": "http://127.0.0.1:8000/payments/callback",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Callback-Token": "rahasia-callback-gateway"
+    },
+    "req_body": {
+      "external_ref": "SB-EA451674739A",
+      "status": "paid",
+      "amount": "150000.00"
+    },
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 431.54,
+    "passed": true,
+    "res_body": {
+      "message": "Pembayaran berhasil, enrollment aktif",
+      "data": {
+        "id": "e52311a7-93a0-498c-bb96-38f4aea9d4f7",
+        "invoice_id": "3f2a0629-8cf8-4a12-88f0-5f2651514461",
+        "method": "bank_transfer",
+        "external_ref": "SB-EA451674739A",
+        "amount": "150000.00",
+        "status": "paid"
+      },
+      "errors": null
+    },
+    "notes": "Mengubah status Payment menjadi paid, Invoice paid, Order paid, dan Enrollment active dalam 1 transaksi."
+  },
+  {
+    "id": "TC-PAY-07",
+    "category": "Payments",
+    "name": "Pengujian Idempotensi Callback Gateway (Dipanggil Ulang)",
+    "method": "POST",
+    "url": "/payments/callback",
+    "full_url": "http://127.0.0.1:8000/payments/callback",
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Callback-Token": "rahasia-callback-gateway"
+    },
+    "req_body": {
+      "external_ref": "SB-EA451674739A",
+      "status": "paid",
+      "amount": "150000.00"
+    },
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 389.15,
+    "passed": true,
+    "res_body": {
+      "message": "Callback sudah pernah diproses",
+      "data": {
+        "id": "e52311a7-93a0-498c-bb96-38f4aea9d4f7",
+        "invoice_id": "3f2a0629-8cf8-4a12-88f0-5f2651514461",
+        "method": "bank_transfer",
+        "external_ref": "SB-EA451674739A",
+        "amount": "150000.00",
+        "status": "paid"
+      },
+      "errors": null
+    },
+    "notes": "Sistem mengembalikan 200 'Callback sudah pernah diproses' tanpa mengeksekusi mutasi ulang."
+  },
+  {
+    "id": "TC-PRG-01",
+    "category": "Learning Progress",
+    "name": "Mengecek Status Enrollment di /enrollments/mycourses Pasca Pembayaran",
+    "method": "GET",
+    "url": "/enrollments/mycourses",
+    "full_url": "http://127.0.0.1:8000/enrollments/mycourses",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": null,
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 331.83,
+    "passed": true,
+    "res_body": {
+      "message": "Berhasil",
+      "data": [
+        {
+          "enrollment_id": "4c055b75-c3de-4d16-8d52-df8777eea324",
+          "course_id": "11bce27b-7552-4295-98ce-5f27694c4f6e",
+          "title": "REST API dengan FastAPI",
+          "status": "active",
+          "completed_modules": 0,
+          "total_modules": 4,
+          "progress_percentage": 0.0
+        }
+      ],
+      "errors": null
+    },
+    "notes": "Memastikan enrollment telah berubah status menjadi 'active' dengan total modul pembelajaran 4."
+  },
+  {
+    "id": "TC-PRG-02",
+    "category": "Learning Progress",
+    "name": "Memperbarui Modul 1 Menjadi Selesai (Progress 25%)",
+    "method": "PATCH",
+    "url": "/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "full_url": "http://127.0.0.1:8000/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "module_id": "37b00b44-ffc1-48d2-977e-22387b561735",
+      "status": "completed"
+    },
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 341.51,
+    "passed": true,
+    "res_body": {
+      "message": "Progress diperbarui",
+      "data": {
+        "enrollment_id": "4c055b75-c3de-4d16-8d52-df8777eea324",
+        "enrollment_status": "active",
+        "completed_modules": 1,
+        "total_modules": 4,
+        "progress_percentage": 25.0
+      },
+      "errors": null
+    },
+    "notes": "Status modul 1 selesai, progress bertambah menjadi 25.0%."
+  },
+  {
+    "id": "TC-PRG-03.2",
+    "category": "Learning Progress",
+    "name": "Menyelesaikan Modul 2 (Routing dan Validasi)",
+    "method": "PATCH",
+    "url": "/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "full_url": "http://127.0.0.1:8000/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "module_id": "078b919a-eb3a-4444-81dd-1b7c3bb45abc",
+      "status": "completed"
+    },
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 349.47,
+    "passed": true,
+    "res_body": {
+      "message": "Progress diperbarui",
+      "data": {
+        "enrollment_id": "4c055b75-c3de-4d16-8d52-df8777eea324",
+        "enrollment_status": "active",
+        "completed_modules": 2,
+        "total_modules": 4,
+        "progress_percentage": 50.0
+      },
+      "errors": null
+    },
+    "notes": "Menyelesaikan modul 2 dari 4."
+  },
+  {
+    "id": "TC-PRG-03.3",
+    "category": "Learning Progress",
+    "name": "Menyelesaikan Modul 3 (Database dan ORM)",
+    "method": "PATCH",
+    "url": "/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "full_url": "http://127.0.0.1:8000/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "module_id": "f4deb50e-d230-463e-a7ef-8a0edb0c2786",
+      "status": "completed"
+    },
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 326.44,
+    "passed": true,
+    "res_body": {
+      "message": "Progress diperbarui",
+      "data": {
+        "enrollment_id": "4c055b75-c3de-4d16-8d52-df8777eea324",
+        "enrollment_status": "active",
+        "completed_modules": 3,
+        "total_modules": 4,
+        "progress_percentage": 75.0
+      },
+      "errors": null
+    },
+    "notes": "Menyelesaikan modul 3 dari 4."
+  },
+  {
+    "id": "TC-PRG-03.4",
+    "category": "Learning Progress",
+    "name": "Menyelesaikan Modul 4 (Autentikasi JWT)",
+    "method": "PATCH",
+    "url": "/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "full_url": "http://127.0.0.1:8000/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "module_id": "0f5d89dc-17fb-4e82-9297-379b967efaef",
+      "status": "completed"
+    },
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 328.5,
+    "passed": true,
+    "res_body": {
+      "message": "Progress diperbarui",
+      "data": {
+        "enrollment_id": "4c055b75-c3de-4d16-8d52-df8777eea324",
+        "enrollment_status": "completed",
+        "completed_modules": 4,
+        "total_modules": 4,
+        "progress_percentage": 100.0
+      },
+      "errors": null
+    },
+    "notes": "Menyelesaikan modul 4 dari 4."
+  },
+  {
+    "id": "TC-PRG-04",
+    "category": "Learning Progress",
+    "name": "Verifikasi Status Akhir Kursus (Status: completed, 100%)",
+    "method": "GET",
+    "url": "/enrollments/mycourses",
+    "full_url": "http://127.0.0.1:8000/enrollments/mycourses",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYWFkYzc3Ni0xYjZmLTQyMjktOTlmZS01N2QwZmQyYmZkZTciLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI4MX0.IawObKxctkCZ8-8RAS11-PALqBvkdQTxSU2ExcRCYTI",
+      "Content-Type": "application/json"
+    },
+    "req_body": null,
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 319.33,
+    "passed": true,
+    "res_body": {
+      "message": "Berhasil",
+      "data": [
+        {
+          "enrollment_id": "4c055b75-c3de-4d16-8d52-df8777eea324",
+          "course_id": "11bce27b-7552-4295-98ce-5f27694c4f6e",
+          "title": "REST API dengan FastAPI",
+          "status": "completed",
+          "completed_modules": 4,
+          "total_modules": 4,
+          "progress_percentage": 100.0
+        }
+      ],
+      "errors": null
+    },
+    "notes": "Seluruh modul tuntas diselesaikan; status enrollment otomatis berubah menjadi 'completed'."
+  },
+  {
+    "id": "TC-SEC-01",
+    "category": "Security & Isolation",
+    "name": "Registrasi Akun Siswa Kedua (User Lain)",
+    "method": "POST",
+    "url": "/auth/register",
+    "full_url": "http://127.0.0.1:8000/auth/register",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "full_name": "Ahmad Dani",
+      "email": "ahmad.siswa.1f1206@mail.com",
+      "password": "PasswordLain123!"
+    },
+    "expected_status": 201,
+    "actual_status": 201,
+    "latency_ms": 584.19,
+    "passed": true,
+    "res_body": {
+      "message": "Registrasi berhasil",
+      "data": {
+        "id": "3d26206b-dcf5-4b34-81e1-2057ad76e6fd",
+        "full_name": "Ahmad Dani",
+        "email": "ahmad.siswa.1f1206@mail.com",
+        "role": "student"
+      },
+      "errors": null
+    },
+    "notes": "Membuat pengguna siswa kedua untuk menguji isolasi data."
+  },
+  {
+    "id": "TC-SEC-02",
+    "category": "Security & Isolation",
+    "name": "Login Akun Siswa Kedua",
+    "method": "POST",
+    "url": "/auth/login",
+    "full_url": "http://127.0.0.1:8000/auth/login",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "email": "ahmad.siswa.1f1206@mail.com",
+      "password": "PasswordLain123!"
+    },
+    "expected_status": 200,
+    "actual_status": 200,
+    "latency_ms": 578.44,
+    "passed": true,
+    "res_body": {
+      "message": "Login berhasil",
+      "data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzZDI2MjA2Yi1kY2Y1LTRiMzQtODFlMS0yMDU3YWQ3NmU2ZmQiLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI5M30.ujzMvU8FJL23p4Fpd-GS23cpHd1_0zoPMylqXiq0Ttg",
+        "token_type": "bearer",
+        "user": {
+          "id": "3d26206b-dcf5-4b34-81e1-2057ad76e6fd",
+          "full_name": "Ahmad Dani",
+          "email": "ahmad.siswa.1f1206@mail.com",
+          "role": "student"
+        }
+      },
+      "errors": null
+    },
+    "notes": "Mendapatkan token untuk siswa kedua."
+  },
+  {
+    "id": "TC-SEC-03",
+    "category": "Security & Isolation",
+    "name": "Siswa Lain Mencoba Mengakses/Mengubah Progress Siswa Pertama",
+    "method": "PATCH",
+    "url": "/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "full_url": "http://127.0.0.1:8000/enrollments/4c055b75-c3de-4d16-8d52-df8777eea324/progress",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzZDI2MjA2Yi1kY2Y1LTRiMzQtODFlMS0yMDU3YWQ3NmU2ZmQiLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI5M30.ujzMvU8FJL23p4Fpd-GS23cpHd1_0zoPMylqXiq0Ttg",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "module_id": "37b00b44-ffc1-48d2-977e-22387b561735",
+      "status": "completed"
+    },
+    "expected_status": 404,
+    "actual_status": 404,
+    "latency_ms": 313.97,
+    "passed": true,
+    "res_body": {
+      "message": "Enrollment tidak ditemukan",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Mengembalikan 404 Not Found (bukan 403) agar tidak membocorkan eksistensi data milik siswa lain."
+  },
+  {
+    "id": "TC-SEC-04",
+    "category": "Security & Isolation",
+    "name": "Siswa Lain Mencoba Membayar Invoice Siswa Pertama",
+    "method": "POST",
+    "url": "/payments",
+    "full_url": "http://127.0.0.1:8000/payments",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzZDI2MjA2Yi1kY2Y1LTRiMzQtODFlMS0yMDU3YWQ3NmU2ZmQiLCJyb2xlIjoic3R1ZGVudCIsImV4cCI6MTc5Mjk5OTI5M30.ujzMvU8FJL23p4Fpd-GS23cpHd1_0zoPMylqXiq0Ttg",
+      "Content-Type": "application/json"
+    },
+    "req_body": {
+      "invoice_id": "3f2a0629-8cf8-4a12-88f0-5f2651514461",
+      "method": "qris"
+    },
+    "expected_status": 404,
+    "actual_status": 404,
+    "latency_ms": 340.53,
+    "passed": true,
+    "res_body": {
+      "message": "Invoice tidak ditemukan",
+      "data": null,
+      "errors": null
+    },
+    "notes": "Sistem mengisolasi akses invoice; siswa lain tidak dapat memproses invoice milik siswa pertama."
+  }
+]

@@ -1,0 +1,27 @@
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment Variables & Secrets (JANGAN DI-COMMIT)
+.env
+*.env.local
+
+# Testing & Cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor & IDE
+.vscode/
+.idea/
+*.swp
+
+# OS generated
+Thumbs.db
+.DS_Store
